@@ -161,16 +161,16 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-void USART2_IRQHandler(void)
+void USART3_IRQHandler(void)
 {
 
-	if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)  // 1. read SR
+	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  // 1. read SR
 	{
 		
-		USART_ClearITPendingBit(USART2,USART_IT_RXNE);       // 2. clear flag
+		USART_ClearITPendingBit(USART3,USART_IT_RXNE);       // 2. clear flag
 		
 		// enqueue
-		CycQueueIn(q,USART_ReceiveData(USART2));   					 // 3. read DR
+		CycQueueIn(q,USART_ReceiveData(USART3));   					 // 3. read DR
 		
 	}  
 

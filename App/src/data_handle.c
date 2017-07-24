@@ -10,32 +10,66 @@
 
 extern CycQueue *q;
 
+#define UART_MAX_RECV_LEN		255					//最大接收缓存字节数
+
 volatile uint8_t offset = 0;
 volatile uint8_t rx_index = 0;
 uint8_t rx_frame_len = 0;
 uint8_t frame_data_len = 0;
-uint8_t uart_rx_buf[255] = {0};
+uint8_t uart_rx_buf[UART_MAX_RECV_LEN+1] = {0};
 uint8_t data_handle_buf[50] = {0};
 /*
  *
  * 将串口接收到的数据分为一帧一帧的
  *
  */
-void frame_data_prase(void)
+void frame_data_parse(void)
 {
-	while( (rx_index < 255) && (CycQueueIsEmpty(q) == 0 ) ) // CycQueueIsEmpty() return true when queue is empty.
+	char *uart_data_left, *p, *p1;
+	char *p_temp = NULL;	
+	u16 length = 0; 	
+	if( (rx_index < UART_MAX_RECV_LEN) && (CycQueueIsEmpty(q) == 0 ) ) // CycQueueIsEmpty() return true when queue is empty.
 	{
-
 		uint8_t ch = CycQueueOut(q);
-		uart_rx_buf[rx_index++] = ch;
-		printf("%x ",ch);
-		
+		uart_rx_buf[rx_index++] = ch;	
 	}
-	
-	if(rx_index <= PROTOCOL_FIXED_LENGTH )
+
+	uart_rx_buf[rx_index]=0;
+
+	if(rx_index <= MSG_STR_LEN_OF_HEADER )
 	{
 		return;
 	}
+	
+	uart_data_left = &uart_rx_buf[offset];
+	while((p=strstr(uart_data_left, MSG_SERVER_STR_HEADER))!=NULL)
+	{
+		if((p1=strstr((const char*)p,"#"))!=NULL)
+		{
+			//调用异或和函数来校验回文	
+			length = p1 - p +1;
+			//校验数据
+			uint8_t sum = get_check_sum((unsigned char *)p,length-5);			
+			Printf("sum:%d\r\n",sum);
+			
+			//取字符串中的校验值,校验值转化为数字，并打印
+			uint8_t sum_field = atoi((const char *)(p+length-5));	
+			Printf("sum_field:%d\r\n",sum_field);
+			
+			//回文正确
+			if(sum == sum_field)
+			{
+				memcpy(data_handle_buf, p, length);
+				
+				cmd_handle();
+			}
+			uart_data_left = p1;
+		}
+		else
+			break;
+	}
+	
+
 	
 	while((rx_index - offset) >  PROTOCOL_FIXED_LENGTH)
 	{

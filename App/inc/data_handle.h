@@ -5,7 +5,7 @@
 
 
 void cmd_handle(void);
-void frame_data_prase(void);
+void frame_data_parse(void);
 void write_cmd_handle(void);
 
 

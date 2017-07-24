@@ -8,6 +8,7 @@
 #include "queue.h"
 #include "delay.h"
 #include "rtc.h"
+#include "timer.h"
 
 /* Private function prototypes -----------------------------------------------*/
 static void test_io(void);
@@ -45,6 +46,7 @@ int main(void)
 	
 	while(1)
 	{
+#if 0	
 		unsigned long t = millis();
 		if ((t - lastInActivity > MQTT_KEEPALIVE*1000UL) || (t - lastOutActivity > MQTT_KEEPALIVE*1000UL)) {
 			if (pingOutstanding) {
@@ -60,8 +62,8 @@ int main(void)
 				pingOutstanding = true;
 			}
 		}	
-		
-		frame_data_prase();
+#endif		
+		frame_data_parse();
 		//delay_ms(1000);
 
 		/* If 1s has been elapsed */

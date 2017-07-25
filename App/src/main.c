@@ -41,10 +41,10 @@ int main(void)
 	usart3_init(115200);
 	rtc_init();
 	
-	//TIM6_Int_Init(9999,2399);						     // 1s÷–∂œ
-	//TIM_SetCounter(TIM6,0); 
-	//TIM_Cmd(TIM6,ENABLE);
-BSP_Printf("malloc error!\n");	
+	TIM6_Int_Init(9999,2399);						     // 1s÷–∂œ
+	TIM_SetCounter(TIM6,0); 
+	TIM_Cmd(TIM6,ENABLE);	
+	
 	while(1)
 	{
 #if 0	

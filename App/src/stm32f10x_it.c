@@ -155,7 +155,7 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
 
-
+#if 0
 /**
   * @brief  This function handles USART2 interrupt request.
   * @param  None
@@ -175,7 +175,7 @@ void USART3_IRQHandler(void)
 	}  
 
 }
-
+#endif
 /**
   * @brief  This function handles RTC global interrupt request.
   * @param  None

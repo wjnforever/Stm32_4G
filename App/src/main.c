@@ -1,7 +1,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_conf.h"
-#include "uart.h"
+#include "usart.h"
+#include "usart3.h"
 #include "systick.h"
 #include <stdio.h>
 #include "data_handle.h"
@@ -30,20 +31,20 @@ int main(void)
 	
 	if(q == NULL)
 	{
-		//printf("malloc error!\n");
+		//BSP_Printf("malloc error!\n");
 	}
 	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	
 	delay_init(72);
-	uart1_init(115200);
-	uart3_init(115200);
+	usart1_init(115200);
+	usart3_init(115200);
 	rtc_init();
 	
-	TIM6_Int_Init(9999,2399);						     // 1s÷–∂œ
-	TIM_SetCounter(TIM6,0); 
-	TIM_Cmd(TIM6,ENABLE);
-	
+	//TIM6_Int_Init(9999,2399);						     // 1s÷–∂œ
+	//TIM_SetCounter(TIM6,0); 
+	//TIM_Cmd(TIM6,ENABLE);
+BSP_Printf("malloc error!\n");	
 	while(1)
 	{
 #if 0	
@@ -69,7 +70,7 @@ int main(void)
 		/* If 1s has been elapsed */
 		if (TimeDisplay == 1)
 		{
-			printf("\n\r");
+			BSP_Printf("\n\r");
 			/* Display current time */
 			Time_Display(RTC_GetCounter());
 			TimeDisplay = 0;

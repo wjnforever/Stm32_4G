@@ -415,11 +415,6 @@
               <FilePath>.\App\src\systick.c</FilePath>
             </File>
             <File>
-              <FileName>uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\App\src\uart.c</FilePath>
-            </File>
-            <File>
               <FileName>rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\App\src\rtc.c</FilePath>
@@ -433,6 +428,16 @@
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\App\src\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\src\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\src\usart3.c</FilePath>
             </File>
           </Files>
         </Group>

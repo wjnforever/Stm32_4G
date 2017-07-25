@@ -2,7 +2,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
 #include "flash.h"
-#include "uart.h"
+#include "usart.h"
 
 void save_enable_state(uint8_t channel, uint8_t state)
 {

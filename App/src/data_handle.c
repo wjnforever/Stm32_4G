@@ -3,7 +3,7 @@
 #include "data_handle.h"
 #include "stm32f10x.h"
 #include "queue.h"
-#include "uart.h"
+#include "usart.h"
 #include <stdio.h>
 #include <string.h>
 #include "flash.h"
@@ -40,7 +40,8 @@ void frame_data_parse(void)
 	{
 		return;
 	}
-	
+
+#if 0	
 	uart_data_left = &uart_rx_buf[offset];
 	while((p=strstr(uart_data_left, MSG_SERVER_STR_HEADER))!=NULL)
 	{
@@ -50,11 +51,11 @@ void frame_data_parse(void)
 			length = p1 - p +1;
 			//校验数据
 			uint8_t sum = get_check_sum((unsigned char *)p,length-5);			
-			Printf("sum:%d\r\n",sum);
+			BSP_Printf("sum:%d\r\n",sum);
 			
 			//取字符串中的校验值,校验值转化为数字，并打印
 			uint8_t sum_field = atoi((const char *)(p+length-5));	
-			Printf("sum_field:%d\r\n",sum_field);
+			BSP_Printf("sum_field:%d\r\n",sum_field);
 			
 			//回文正确
 			if(sum == sum_field)
@@ -104,14 +105,14 @@ void frame_data_parse(void)
 		}
 		
 		uint8_t recvSum = uart_rx_buf[offset + rx_frame_len - 1];
-		printf("recvSum: %x\n",recvSum);
+		BSP_Printf("recvSum: %x\n",recvSum);
 		uint8_t sum = get_check_sum((unsigned char *)&uart_rx_buf[offset],rx_frame_len - 1);
-		printf("sum: %x\n",sum);
+		BSP_Printf("sum: %x\n",sum);
 		
 		//
 		if(sum != recvSum)
 		{
-		  printf("check sum fail\n");
+		  BSP_Printf("check sum fail\n");
 		  //
 		  offset += 2;
 		  continue;
@@ -122,17 +123,17 @@ void frame_data_parse(void)
 		
 		cmd_handle();
 		
-		printf("one frame parse over\n");
+		BSP_Printf("one frame parse over\n");
 
 		offset += rx_frame_len;
 		
-		printf("offset: %d\n",offset);
+		BSP_Printf("offset: %d\n",offset);
 			
 	}//end while
 		
 	rx_index -= offset;
 	  
-	printf("rx_in: %d\n",rx_index);
+	BSP_Printf("rx_in: %d\n",rx_index);
 	
 	if(rx_index > 0)
 	{
@@ -142,7 +143,7 @@ void frame_data_parse(void)
 	
 	offset = 0;
 	rx_frame_len = 0;
-	
+#endif	
 }
 
 /*
@@ -152,26 +153,6 @@ void frame_data_parse(void)
 void cmd_handle(void)
 {
 
-	switch(data_handle_buf[CMD])
-	{
-	
-		case READ:
-			
-			//read_cmd_handle();
-		
-		break;
-		
-		case WRITE:
-			
-			write_cmd_handle();
-		
-		break;
-		
-		default:
-			
-		break;
-		
-	}
 
 }
 

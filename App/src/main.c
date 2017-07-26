@@ -19,6 +19,20 @@ static void test_io(void);
 CycQueue *q = NULL; 
 extern __IO uint32_t TimeDisplay;
 
+u8 Check_Xor_Sum(char* pBuf, u16 len)
+{
+	u8 Sum = 0;
+	u8 i = 0;
+	Sum = pBuf[0];
+	
+	for (i = 1; i < len; i++ )
+	{
+		Sum = (Sum ^ pBuf[i]);
+	}
+	
+	return Sum;
+}
+
 /**
   * @brief  Main program
   * @param  None
@@ -26,7 +40,6 @@ extern __IO uint32_t TimeDisplay;
   */
 int main(void)
 {
-
 	q = CycQueueInit();
 	
 	if(q == NULL)
@@ -64,7 +77,10 @@ int main(void)
 			}
 		}	
 #endif		
-		frame_data_parse();
+
+		if((USART3_RX_STA&(1<<15)) != 0)
+			frame_data_parse();
+
 		//delay_ms(1000);
 
 		/* If 1s has been elapsed */

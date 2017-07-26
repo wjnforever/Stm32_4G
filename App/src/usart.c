@@ -52,29 +52,6 @@ void usart1_init(u32 bound)
 
 }
 
-/*******************************************************************************
- * FunctionName: get_check_sum
- * Description : calculator check sum
- * Parameters  : pack 
- *               pack_len 
- * Returns     : check sum
- *
- *******************************************************************************/
-uint8_t get_check_sum(uint8_t *pack, uint8_t pack_len)
-{
-  uint8_t i;
-  uint8_t check_sum = 0;
-  
-  for(i = 0; i < pack_len; i ++)
-  {
-    check_sum += *(pack++);
-  }
-  
-  return check_sum;
-}
-
-
-
 /**
   * @brief  Retargets the C library printf function to the USART.
   * @param  None

@@ -10,14 +10,36 @@
 
 extern CycQueue *q;
 
-#define UART_MAX_RECV_LEN		255					//最大接收缓存字节数
+#define UART_MAX_RECV_LEN		256					//最大接收缓存字节数
 
-volatile uint8_t offset = 0;
-volatile uint8_t rx_index = 0;
+//volatile uint8_t offset = 0;
+//volatile uint8_t rx_index = 0;
 uint8_t rx_frame_len = 0;
 uint8_t frame_data_len = 0;
-uint8_t uart_rx_buf[UART_MAX_RECV_LEN+1] = {0};
+uint8_t uart_rx_buf[UART_MAX_RECV_LEN] = {0};
 uint8_t data_handle_buf[50] = {0};
+
+/*******************************************************************************
+ * FunctionName: get_check_sum
+ * Description : calculator check sum
+ * Parameters  : pack 
+ *               pack_len 
+ * Returns     : check sum
+ *
+ *******************************************************************************/
+uint8_t get_check_sum(uint8_t *pack, uint8_t pack_len)
+{
+	uint8_t i;
+	uint8_t check_sum = 0;
+  
+	for(i = 0; i < pack_len; i ++)
+	{
+		check_sum += *(pack++);
+	}
+  
+	return check_sum;
+}
+
 /*
  *
  * 将串口接收到的数据分为一帧一帧的
@@ -25,6 +47,66 @@ uint8_t data_handle_buf[50] = {0};
  */
 void frame_data_parse(void)
 {
+#if 1
+	u16 length = 0; 
+	u8 result = 0;
+	u8 result_temp = 0;
+	char *uart_data_left;
+	char *p, *p1;
+	char *p_temp = NULL;		
+	
+	strcpy(uart_rx_buf, USART3_RX_BUF);
+	Clear_USART3();
+	uart_data_left = (char *)uart_rx_buf;
+	while((p=strstr(uart_data_left, MSG_SERVER_STR_HEADER))!=NULL)
+	{
+		if((p1=strstr((const char*)p,"#"))!=NULL)
+		{
+			//调用异或和函数来校验回文	
+			length = p1 - p +1;
+			//校验数据
+			result = get_check_sum((char *)(p),length-5);
+			BSP_Printf("result:%d\r\n",result);
+			
+			//取字符串中的校验值,校验值转化为数字，并打印
+			result_temp = atoi((const char *)(p+length-5));	
+			BSP_Printf("result_temp:%d\r\n",result_temp);
+			
+			//回文正确
+			if(result == result_temp)
+			{
+				msg_server_info *pMsg=(msg_server_info *)p;
+				u8 cmd=atoi(pMsg->cmd);
+				if(atoi(pMsg->cmd)				
+				if((p_temp+(MSG_STR_LEN_OF_SEQ+1)) < p1)
+				{
+					//BSP_Printf("seq:%d %d\r\n",dev.msg_seq, atoi(p_temp));
+					if(msg_wait_check == MSG_STR_ID_OPEN)
+					{
+						BSP_Printf("Recv Seq:%d Msg:%d from Server\n", atoi(p_temp), msg_wait_check);
+						dev.msg_seq_s = atoi(p_temp);
+						Reset_Device_Status(CMD_OPEN_DEVICE);
+						strncpy(dev.device_on_cmd_string, p, p1 - p +1);
+						break;
+					}
+					else if((msg_wait_check == MSG_STR_ID_LOGIN) || (msg_wait_check == MSG_STR_ID_HB) || 
+							(msg_wait_check == MSG_STR_ID_CLOSE))
+					{
+						if(atoi(p_temp) == dev.msg_seq)
+						{
+							BSP_Printf("Recv Seq:%d Msg:%d from Server\n", dev.msg_seq, msg_wait_check);
+							Reset_Device_Status(CMD_TO_IDLE);
+							break;							
+						}
+					}
+				}
+			}
+			uart_data_left = p1;
+		}
+		else
+			break;
+	}			
+#else
 	char *uart_data_left, *p, *p1;
 	char *p_temp = NULL;	
 	u16 length = 0; 	
@@ -34,44 +116,11 @@ void frame_data_parse(void)
 		uart_rx_buf[rx_index++] = ch;	
 	}
 
-	uart_rx_buf[rx_index]=0;
-
 	if(rx_index <= MSG_STR_LEN_OF_HEADER )
 	{
 		return;
 	}
 
-#if 0	
-	uart_data_left = &uart_rx_buf[offset];
-	while((p=strstr(uart_data_left, MSG_SERVER_STR_HEADER))!=NULL)
-	{
-		if((p1=strstr((const char*)p,"#"))!=NULL)
-		{
-			//调用异或和函数来校验回文	
-			length = p1 - p +1;
-			//校验数据
-			uint8_t sum = get_check_sum((unsigned char *)p,length-5);			
-			BSP_Printf("sum:%d\r\n",sum);
-			
-			//取字符串中的校验值,校验值转化为数字，并打印
-			uint8_t sum_field = atoi((const char *)(p+length-5));	
-			BSP_Printf("sum_field:%d\r\n",sum_field);
-			
-			//回文正确
-			if(sum == sum_field)
-			{
-				memcpy(data_handle_buf, p, length);
-				
-				cmd_handle();
-			}
-			uart_data_left = p1;
-		}
-		else
-			break;
-	}
-	
-
-	
 	while((rx_index - offset) >  PROTOCOL_FIXED_LENGTH)
 	{
  
@@ -143,7 +192,7 @@ void frame_data_parse(void)
 	
 	offset = 0;
 	rx_frame_len = 0;
-#endif	
+#endif
 }
 
 /*
